@@ -1,0 +1,1185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pranab Sarker — Full Stack Engineer</title>
+<meta name="description" content="Pranab Sarker, Senior Full Stack Engineer in Finland. Interactive CV with case studies: AI tutoring, data spaces, digital twins and public-sector systems.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f4f9fc; --paper:#ffffff; --ink:#0f1b61; --muted:#47548a; --faint:#73bbc5; --line-soft:#d8e9f1;
+  --line:#6000cb; --fill:#aadcec; --duo:#105d67; --accent:#6000cb; --accent-2:#105d67; --accent-soft:#eef7fb;
+  --serif:Bitter,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --stripes:repeating-linear-gradient(-45deg,var(--fill) 0 3px,transparent 3px 9px);
+  /* node colours by kind (soft fills, purple outline everywhere) */
+  --k-source:#e4f3f9; --k-process:#efe6fb; --k-store:#e0f3ef; --k-ai:#fdf1d8; --k-ui:#fbe7f0; --k-ext:#f1f4f7;
+  --todo-bg:#fff3b0; --todo-ink:#5c4500; --verify:#d39a00;
+  --ease:cubic-bezier(.165,.84,.44,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--ink);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+/* white frame around the viewport */
+html::before,html::after,body::before,body::after{content:"";position:fixed;background:#fff;z-index:60;pointer-events:none}
+html::before,html::after{top:0;bottom:0;width:14px}
+html::before{left:0} html::after{right:0}
+body::before,body::after{left:0;right:0;height:14px}
+body::before{top:0} body::after{bottom:0}
+@media (max-width:600px){html::before,html::after{width:8px}body::before,body::after{height:8px}}
+a{color:inherit;font-weight:700;text-decoration:none;border-bottom:.14em solid var(--fill);transition:border-color .2s}
+a:hover{border-color:var(--line)}
+button{font:inherit;cursor:pointer}
+h1,h2,h3,h4{font-family:var(--serif);color:var(--ink)}
+
+/* ---------- review markers ---------- */
+.todo,.review-fab{display:none}
+.review .todo{display:inline;background:var(--todo-bg);color:var(--todo-ink);padding:1px 6px;border-radius:4px;font:500 .84em/1.4 var(--sans)}
+.review .verify{text-decoration:underline dotted var(--verify) 2px;text-underline-offset:3px}
+.has-review .review-fab{display:flex;position:fixed;right:26px;bottom:26px;z-index:70;align-items:center;gap:8px;background:#fff;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--fill);padding:7px 13px;font-size:13px;font-weight:600;color:var(--ink)}
+.review-fab b{width:10px;height:10px;border-radius:50%;background:#d0d5df}
+.review .review-fab b{background:#f2c200}
+
+/* ---------- layout ---------- */
+#app{min-height:100vh;padding:48px 24px 90px}
+.view{animation:enter .7s var(--ease) both}
+@keyframes enter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.paper{position:relative;max-width:880px;margin:0 auto;background:var(--paper);border:2px solid var(--ink);box-shadow:16px 16px 0 var(--fill);padding:60px 64px}
+@media (max-width:700px){.paper{padding:30px 22px;box-shadow:8px 8px 0 var(--fill)}#app{padding:26px 14px 80px}}
+
+/* ---------- view transitions ---------- */
+::view-transition-old(root){animation:vt-out .32s var(--ease) both}
+::view-transition-new(root){animation:vt-in .5s var(--ease) both}
+html[data-nav="back"]::view-transition-old(root){animation:vt-out-back .32s var(--ease) both}
+html[data-nav="back"]::view-transition-new(root){animation:vt-in-back .5s var(--ease) both}
+@keyframes vt-out{to{opacity:0;transform:translateX(-40px)}}
+@keyframes vt-in{from{opacity:0;transform:translateX(60px)}}
+@keyframes vt-out-back{to{opacity:0;transform:translateX(40px)}}
+@keyframes vt-in-back{from{opacity:0;transform:translateX(-60px)}}
+::view-transition-group(*){animation-duration:.5s;animation-timing-function:var(--ease)}
+
+/* ---------- CV header with animated portrait ---------- */
+.cv-head{display:grid;grid-template-columns:1fr 230px;gap:28px;align-items:center;padding-bottom:30px;border-bottom:2px solid var(--ink)}
+.cv-head h1{margin:0;font-size:clamp(36px,6vw,54px);line-height:1.05;letter-spacing:-.01em}
+.cv-head h1 .dot,.dot{color:var(--faint)}
+.cv-head .role{font-family:var(--serif);font-size:19px;color:var(--duo);margin:8px 0 14px;font-weight:700}
+.contacts{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14.5px;color:var(--muted)}
+.contacts a{font-weight:600}
+.head-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+@media (max-width:700px){.cv-head{grid-template-columns:1fr}.portrait{order:-1;width:190px;margin:0 auto}}
+
+.portrait{position:relative;width:230px;aspect-ratio:1;--mx:0;--my:0}
+.portrait .p-stripes{position:absolute;inset:6% -6% -6% 6%;border-radius:50%;background:var(--stripes);animation:spin 40s linear infinite;transform:translate(calc(var(--mx)*-14px),calc(var(--my)*-14px))}
+.portrait .p-ring{position:absolute;inset:-4%;border-radius:50%;border:2px dashed var(--line);opacity:.55;animation:spin 60s linear infinite reverse}
+.portrait .p-photo{position:absolute;inset:0;border-radius:50%;overflow:hidden;border:2px solid var(--ink);background:var(--fill);transform:translate(calc(var(--mx)*8px),calc(var(--my)*8px));transition:transform .6s var(--ease);animation:avatarIn 1.2s var(--ease) both}
+.portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:breathe 7s ease-in-out infinite}
+.portrait .p-duo{filter:url(#duotone)}
+.portrait .p-real{opacity:0;transition:opacity .8s var(--ease)}
+.portrait:hover .p-real{opacity:1}
+.portrait .p-spark{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--line);right:10%;top:6%;box-shadow:0 0 0 6px rgba(96,0,203,.12);animation:orbit 9s ease-in-out infinite}
+.portrait .p-spark.s2{width:10px;height:10px;background:var(--duo);left:2%;right:auto;top:auto;bottom:16%;animation-delay:-4s}
+@keyframes spin{to{rotate:360deg}}
+@keyframes breathe{50%{transform:scale(1.04)}}
+@keyframes avatarIn{from{clip-path:circle(0% at 50% 50%)}to{clip-path:circle(75% at 50% 50%)}}
+@keyframes orbit{50%{transform:translate(-8px,10px)}}
+
+/* ---------- buttons ---------- */
+.pill-btn{display:inline-block;border:2px solid var(--ink);background:#fff;padding:8px 16px;font:700 14px/1.2 var(--sans);color:var(--ink);white-space:nowrap;box-shadow:4px 4px 0 var(--fill);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.pill-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--fill);border-color:var(--ink)}
+.pill-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--fill)}
+.pill-btn.primary{background:var(--ink);color:#fff}
+.pill-btn.primary:hover{color:#fff}
+
+/* ---------- CV sections ---------- */
+.cv-sec{margin-top:40px}
+.cv-sec>h2{font-size:26px;margin:0 0 14px;line-height:1.2}
+.cv-sec>h2::after{content:".";color:var(--faint)}
+.summary{margin:0;font-size:16.5px;color:#26336e}
+.hint{font-size:14px;color:var(--muted);margin:-6px 0 14px}
+
+.prow{position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:16px 18px 16px 22px;margin:0 -18px 6px -22px;cursor:pointer;border:2px solid transparent;transition:border-color .25s,box-shadow .3s var(--ease),transform .3s var(--ease),background .25s}
+.prow::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--line);transform:scaleY(0);transform-origin:top;transition:transform .35s var(--ease)}
+.prow:hover,.prow:focus-visible{border-color:var(--ink);box-shadow:8px 8px 0 var(--fill);transform:translate(-3px,-3px);outline:none;background:#fff}
+.prow:hover::before,.prow:focus-visible::before{transform:scaleY(1)}
+.prow .t{font-family:var(--serif);font-weight:700;font-size:19px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.25}
+.prow .kicker{font:700 11px/1 var(--sans);text-transform:uppercase;letter-spacing:.1em;padding:5px 8px;background:var(--accent-soft);color:var(--duo);border:1px solid var(--fill)}
+.prow .when{font-size:13.5px;color:var(--muted);text-align:right;white-space:nowrap;padding-top:3px}
+.prow .d{grid-column:1/-1;color:var(--muted);font-size:15px}
+.prow .res{grid-column:1/-1;font-size:14.5px;font-weight:700;color:var(--duo)}
+.prow .res::before{content:"↗ ";color:var(--line)}
+.prow .go{position:absolute;right:18px;bottom:16px;font-size:13px;font-weight:700;color:var(--line);opacity:0;transform:translateX(-8px);transition:all .3s var(--ease)}
+.prow:hover .go{opacity:1;transform:none}
+.ripple{position:absolute;border-radius:50%;transform:scale(0);background:rgba(170,220,236,.55);animation:ripple .6s ease-out forwards;pointer-events:none}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+.tags{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tag{font-size:12.5px;padding:2px 9px;border:1px solid var(--line-soft);background:var(--bg);color:var(--muted)}
+
+.job{display:grid;grid-template-columns:150px 1fr;gap:4px 20px;padding:10px 0}
+.job .when{color:var(--muted);font-size:14px;padding-top:2px}
+.job .what b{display:block;font-family:var(--serif);font-size:16.5px}
+.job .what span{color:var(--muted);font-size:14.5px}
+.job .what ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;color:#26336e}
+@media (max-width:600px){.job{grid-template-columns:1fr}}
+.mini-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.mini-links a{font-size:13px;padding:3px 10px;border:1.5px solid var(--ink);box-shadow:3px 3px 0 var(--fill);transition:transform .2s,box-shadow .2s}
+.mini-links a:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--fill)}
+.mini-links span{font-size:13px;font-weight:600;padding:3px 10px;border:1.5px solid var(--line-soft);background:var(--bg);color:var(--muted)}
+
+.earlier{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:12px}
+.earlier div{border:1.5px solid var(--line-soft);padding:12px 14px;font-size:14px;background:var(--bg);transition:border-color .2s,box-shadow .3s var(--ease)}
+.earlier div:hover{border-color:var(--ink);box-shadow:5px 5px 0 var(--fill)}
+.earlier b{display:block;font-family:var(--serif);font-size:15.5px}
+.earlier span{color:var(--faint);font-size:12.5px;font-weight:600}
+.earlier p{margin:4px 0 0;color:var(--muted)}
+
+.skills{display:grid;grid-template-columns:140px 1fr;gap:8px 20px;font-size:15px}
+.skills dt{font-family:var(--serif);font-weight:700}
+.skills dd{margin:0;color:#26336e}
+@media (max-width:600px){.skills{grid-template-columns:1fr}.skills dd{margin-bottom:6px}}
+
+/* ---------- detail page ---------- */
+.topbar{max-width:1040px;margin:0 auto 22px;display:flex;align-items:center;gap:14px}
+.back{white-space:nowrap;flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--ink);padding:8px 16px;font-size:14px;color:var(--ink);box-shadow:4px 4px 0 var(--fill);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.back:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--fill);border-color:var(--ink)}
+.crumb{font-size:13.5px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail{max-width:1040px;margin:0 auto}
+.hero{position:relative;overflow:hidden;background:#fff;border:2px solid var(--ink);box-shadow:14px 14px 0 var(--fill);padding:48px 48px 38px}
+.hero .blob{position:absolute;right:-70px;top:-70px;width:260px;height:260px;border-radius:50%;background:var(--stripes);opacity:.8;animation:spin 50s linear infinite}
+.hero .blob.b2{right:40px;top:40px;width:120px;height:120px;background:none;border:2px solid var(--line);opacity:.5;animation:float 8s ease-in-out infinite}
+@keyframes float{50%{transform:translate(-12px,14px)}}
+.hero .kicker{position:relative;display:inline-block;font:700 12px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--duo);background:var(--accent-soft);border:1px solid var(--fill);padding:6px 10px}
+.hero h1{position:relative;font-size:clamp(28px,4.4vw,44px);line-height:1.12;margin:16px 0 14px;max-width:820px}
+.hero h1::after{content:".";color:var(--faint)}
+.hero .lead{position:relative;font-size:17.5px;color:var(--muted);max-width:780px;margin:0}
+.facts{position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px;margin-top:28px}
+.fact{background:var(--bg);border:1.5px solid var(--line-soft);padding:10px 14px}
+.fact small{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);font-weight:700}
+.fact span{font-weight:700;font-size:14.5px}
+.hero .links{position:relative;display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+@media (max-width:700px){.hero{padding:30px 20px;box-shadow:8px 8px 0 var(--fill)}.hero .blob{width:150px;height:150px;right:-60px;top:-60px;opacity:.5}.hero .blob.b2{display:none}}
+
+.block{background:#fff;border:2px solid var(--ink);padding:34px 40px;margin-top:28px}
+.block h2{font-size:24px;margin:0 0 4px}
+.block h2::after{content:".";color:var(--faint)}
+.block .sub{color:var(--muted);margin:0 0 22px;font-size:15px}
+@media (max-width:700px){.block{padding:24px 18px}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media (max-width:800px){.two{grid-template-columns:1fr}}
+.two .block{margin-top:0}
+.prose p{margin:0 0 12px;font-size:16px}
+
+/* ---------- animated flow diagram ---------- */
+.diagram{display:flex;flex-direction:column;gap:20px}
+.lane{position:relative;border:1.5px dashed #b8cfe0;padding:16px 16px 18px;background:var(--bg)}
+.lane-label{font:700 11.5px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--duo);margin-bottom:14px}
+.lane-row{display:flex;align-items:stretch}
+.node{flex:1 1 0;min-width:0;padding:11px 10px;text-align:center;background:var(--nb,#fff);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--fill);transition:transform .4s var(--ease),box-shadow .4s var(--ease),opacity .4s,filter .4s;position:relative}
+.node b{display:block;font-family:var(--serif);font-size:14px;line-height:1.25}
+.node small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.3}
+.node.k-source{--nb:var(--k-source)} .node.k-process{--nb:var(--k-process)} .node.k-store{--nb:var(--k-store)}
+.node.k-ai{--nb:var(--k-ai)} .node.k-ui{--nb:var(--k-ui)} .node.k-ext{--nb:var(--k-ext)}
+.diagram.focus .node{opacity:.32;filter:grayscale(.6)}
+.diagram.focus .node.hl{opacity:1;filter:none;transform:translate(-3px,-5px);box-shadow:8px 9px 0 var(--line);z-index:2}
+.conn{flex:0 0 34px;position:relative;align-self:center;height:20px}
+.conn::before{content:"";position:absolute;left:6px;right:8px;top:50%;border-top:2px dashed var(--line);opacity:.45;transform:translateY(-50%)}
+.conn::after{content:"";position:absolute;right:3px;top:50%;width:7px;height:7px;border-top:2px solid var(--line);border-right:2px solid var(--line);transform:translateY(-50%) rotate(45deg);opacity:.7}
+.conn i{position:absolute;top:50%;left:4px;width:8px;height:8px;border-radius:50%;background:var(--line);margin-top:-4px;box-shadow:0 0 0 4px rgba(96,0,203,.15);animation:flowx 1.6s var(--ease) infinite;animation-delay:var(--d,0s)}
+@keyframes flowx{0%{left:2px;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 12px);opacity:0}}
+@keyframes flowy{0%{top:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:calc(100% - 12px);opacity:0}}
+@media (max-width:720px){
+  .lane-row{flex-direction:column}
+  .conn{flex:0 0 28px;width:20px;height:28px;align-self:center}
+  .conn::before{left:50%;right:auto;top:2px;bottom:8px;border-top:0;border-left:2px dashed var(--line);transform:translateX(-50%)}
+  .conn::after{left:50%;right:auto;top:auto;bottom:3px;transform:translateX(-50%) rotate(135deg)}
+  .conn i{left:50%;margin-left:-4px;margin-top:0;animation-name:flowy}
+}
+.gap{flex:0 0 16px;height:12px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:13px;height:13px;border:1.5px solid var(--ink)}
+
+/* walkthrough */
+.walk{display:grid;grid-template-columns:300px 1fr;gap:22px;margin-top:26px}
+@media (max-width:860px){.walk{grid-template-columns:1fr}}
+.steps{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.step{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;border:1.5px solid var(--line-soft);background:#fff;padding:9px 12px;font-size:14.5px;color:var(--ink);transition:all .3s var(--ease)}
+.step:hover{border-color:var(--ink)}
+.step .n{flex:0 0 24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 12px/1 var(--sans);border:1.5px solid var(--ink);color:var(--ink);transition:all .3s}
+.step.on{border-color:var(--ink);box-shadow:5px 5px 0 var(--fill);transform:translate(-2px,-2px);font-weight:700}
+.step.on .n{background:var(--line);border-color:var(--line);color:#fff}
+.step-panel{position:relative;overflow:hidden;border:2px solid var(--ink);background:#fff;box-shadow:8px 8px 0 var(--fill);padding:22px 24px;min-height:160px}
+.step-panel::after{content:"";position:absolute;right:-40px;bottom:-40px;width:120px;height:120px;border-radius:50%;background:var(--stripes);opacity:.6}
+.step-panel h3{position:relative;margin:0 0 8px;font-size:19px}
+.step-panel p{position:relative;margin:0;color:#26336e}
+.step-panel .fade{animation:enter .45s var(--ease) both}
+.play{display:inline-flex;align-items:center;gap:8px;margin-top:14px}
+.progress{height:4px;background:var(--line-soft);margin-top:18px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--line)}
+.progress i.run{animation:prog var(--t,4s) linear forwards}
+@keyframes prog{to{width:100%}}
+
+/* contributions + decisions */
+.contrib{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.contrib li{display:flex;gap:12px;align-items:flex-start;font-size:15px}
+.contrib li>span.c{flex:1}
+.contrib li::before{content:"";flex:0 0 12px;height:12px;margin-top:6px;border-radius:50%;background:var(--fill);border:2px solid var(--line)}
+.contrib li.team::before{background:#fff;border-color:var(--faint)}
+.contrib li.team{color:var(--muted)}
+.decisions{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr));gap:16px}
+.dec{border:2px solid var(--ink);padding:18px 20px;background:#fff;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease);position:relative}
+.dec:hover,.dec.open{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--fill)}
+.dec h3{font-size:16.5px;margin:0;padding-right:26px;line-height:1.3}
+.dec .why{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+.dec .why>div{overflow:hidden;font-size:14.5px;color:#26336e}
+.dec.open .why{grid-template-rows:1fr}
+.dec.open .why>div{padding-top:10px}
+.dec .plus{position:absolute;right:14px;top:14px;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;font-weight:700;font-size:15px;transition:transform .35s var(--ease),background .3s}
+.dec.open .plus{transform:rotate(45deg);background:var(--fill)}
+.dec .lbl{font:700 11px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--line);margin-bottom:8px;display:block}
+
+/* results */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));gap:14px;margin-bottom:22px}
+.metric{padding:14px 16px;background:var(--bg);border:1.5px solid var(--line-soft);position:relative;overflow:hidden}
+.metric::after{content:"";position:absolute;right:-18px;top:-18px;width:56px;height:56px;border-radius:50%;background:var(--stripes)}
+.metric b{position:relative;display:block;font:700 28px/1.15 var(--serif);color:var(--ink)}
+.metric span{position:relative;font-size:13.5px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13.5px;padding:4px 11px;border:1.5px solid var(--ink);background:#fff;color:var(--ink);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.chip:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--fill)}
+
+/* placement widget */
+.tabs{display:inline-flex;border:2px solid var(--ink);margin-bottom:18px;box-shadow:4px 4px 0 var(--fill)}
+.tabs button{border:0;background:#fff;padding:8px 18px;font-weight:700;font-size:14px;color:var(--muted);transition:all .25s}
+.tabs button+button{border-left:2px solid var(--ink)}
+.tabs button.on{background:var(--ink);color:#fff}
+.zones{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:700px){.zones{grid-template-columns:1fr}}
+.zone{border:1.5px dashed #b8cfe0;padding:14px;min-height:150px;background:var(--bg)}
+.zone h4{margin:0 0 2px;font-size:16px}
+.zone small{color:var(--muted);font-size:12.5px}
+.zone .slot{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.zchip{padding:8px 12px;font-size:13.5px;font-weight:700;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--fill)}
+.zchip.cp{background:var(--k-process);box-shadow:3px 3px 0 var(--line)}
+.zchip.dp{background:var(--k-ai);box-shadow:3px 3px 0 var(--line)}
+.zchip.fixed{background:#fff;font-weight:500}
+.pcap{margin-top:14px;font-size:15px;color:#26336e}
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;margin-top:6px}
+.verdict{padding:16px 18px;border:2px solid var(--ink)}
+.verdict.ok{background:#eaf7f1;box-shadow:6px 6px 0 #9fdcc0}
+.verdict.no{background:#fdf1ec;box-shadow:6px 6px 0 #f1c3b2}
+.verdict h4{margin:4px 0 2px;font-size:16px}
+.verdict .tag2{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.verdict.ok .tag2{color:#13834f}
+.verdict.no .tag2{color:#b4492b}
+.verdict p{margin:6px 0 0;font-size:14px;color:#26336e}
+
+.pager{display:flex;justify-content:space-between;gap:16px;margin-top:30px}
+.pager a{flex:1;background:#fff;border:2px solid var(--ink);padding:16px 20px;color:var(--ink);box-shadow:6px 6px 0 var(--fill);transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.pager a:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--fill);border-color:var(--ink)}
+.pager small{display:block;color:var(--faint);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+.pager b{font-family:var(--serif);font-size:16px}
+.pager .next{text-align:right}
+footer.foot{text-align:center;color:var(--muted);font-size:13.5px;margin-top:34px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+@media print{
+  @page{size:A4;margin:12mm 10mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  html::before,html::after,body::before,body::after{display:none}
+  body{background:#fff}
+  #app{padding:0 12px 12px 0;min-height:0}
+  .view,.portrait *,.portrait img{animation:none!important;transition:none!important}
+  .paper{max-width:none;padding:30px 36px;box-shadow:10px 10px 0 var(--fill)}
+  .no-print,.review-fab,.foot,.prow .go,.ripple,.p-real{display:none!important}
+  .prow,.earlier>div,.cv-head,.job .what ul{break-inside:avoid}
+  .cv-sec{margin-top:24px}
+  .cv-head{padding-bottom:20px}
+  .prow{padding:9px 0 9px 0;margin:0 0 2px}
+  .prow .tags{margin-top:2px}
+  .job{padding:6px 0}
+  .cv-sec>h2{break-after:avoid;break-inside:avoid}
+  .cv-sec>h2::before{content:"";display:block;height:150px;margin-bottom:-150px}
+  .cv-sec:nth-last-of-type(-n+2){break-inside:avoid}
+  .todo{display:none!important}
+  .verify{text-decoration:none!important}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="duotone" color-interpolation-filters="sRGB">
+    <feColorMatrix type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"/>
+    <feComponentTransfer>
+      <feFuncR type="table" tableValues="0.059 0.376 0.84"/>
+      <feFuncG type="table" tableValues="0.106 0.364 0.933"/>
+      <feFuncB type="table" tableValues="0.380 0.404 0.965"/>
+    </feComponentTransfer>
+  </filter>
+</svg>
+<div id="app"></div>
+<button class="review-fab" id="reviewFab" type="button"><b></b><span>Review notes</span></button>
+
+<script>
+/* =====================================================================
+   SETTINGS
+   REVIEW_MODE: true shows yellow TODO notes and dotted underlines on
+   statements to confirm. Set to false before publishing.
+   ===================================================================== */
+const REVIEW_MODE = false;
+
+const PROFILE = {
+  name: "Pranab Sarker",
+  photo: "assets/pranab.jpg",
+  role: "Senior Full Stack Engineer · Java · TypeScript · Python",
+  location: "Finland",
+  email: "pranabumal@gmail.com",
+  linkedin: "https://www.linkedin.com/in/pranab-sarker-4145b48b/",
+  github: "https://github.com/pranabumal",
+  summary: "Full stack engineer with 10+ years of building and running production web systems, from government platforms in Bangladesh to AI tutoring and industrial data spaces at Tampere University. Most at home with Java/Spring Boot, C#/.NET and Angular, and equally productive in Python (Django, FastAPI) and React. I own features end to end: requirements, architecture, code, CI/CD and production monitoring. Finishing an MSc in Software, Web &amp; Cloud. Finnish work permit."
+};
+
+/* Node kinds: source, process, store, ai, ui, ext */
+const PROJECTS = [
+/* ------------------------------------------------------------------ THESIS */
+{
+  id: "edc-thesis",
+  kicker: "MSc thesis · Data spaces",
+  title: "Where should a data space connector run? A testbed across edge and cloud",
+  short: "EDC connector placement testbed",
+  org: "Tampere University · MSc thesis",
+  period: "2026",
+  cvLine: "Distributed testbed measuring Eclipse Dataspace Connector placements (edge, cloud, hybrid) on four machines with manufacturing data flows.",
+  result: "540/540 push transfers delivered, 65,000+ pulls with zero errors; showed which factory data flows a connector can carry",
+  tags: ["Eclipse EDC","Java","Docker","Python stats","React"],
+  lead: "Factories want to share machine data with partners without losing control of it. Data space connectors like Eclipse EDC enforce the contracts, but nobody had measured where a factory should run one: at the edge, in the cloud, or split between the two. I built a four-machine testbed to find out.",
+  facts: [["Role","Sole author"],["Connector","Eclipse Dataspace Components 0.14.1"],["Testbed","4 machines · edge, cloud, source, partner"]],
+  links: [["View code on GitHub","https://github.com/pranabumal/edc-connector-placement-testbed"]],
+  problem: [
+    "An EDC connector has two halves. The <b>Control Plane</b> handles catalogs, contracts and policies. The <b>Data Plane</b> moves the actual bytes. Each can run at the factory edge or in the cloud.",
+    "My thesis, <i>Deploying Data Space Connectors on the Cloud Continuum for Manufacturing</i>, compares three placements (<b>Edge</b>, <b>Cloud</b> and <b>Hybrid</b>, with the Control Plane in the cloud and the Data Plane at the edge) across three manufacturing data flows, using both push and pull transfers."
+  ],
+  diagram: { lanes: [
+    { label: "Control plane: agreeing on a contract", nodes: [
+      ["ccp","Consumer CP","asks the catalog, negotiates","process"],
+      ["pcp","Provider CP","assets · policies · contracts","process"],
+      ["pdp","Provider DP","registered, gets the transfer","ai"] ]},
+    { label: "Data plane: moving the data", nodes: [
+      ["src","Factory source","crane simulator + AAS (Eclipse BaSyx)","source"],
+      ["pdp2","Provider DP","fetches from the source","ai"],
+      ["cdp","Consumer DP","push target / pull client","ai"],
+      ["rcv","Receiver","timestamps every arrival","store"] ]},
+    { label: "Measurement & analysis", nodes: [
+      ["run","Measurement driver","runs TC1–TC4 per placement","ext"],
+      ["clk","Clock check","offsets within ±3 ms","process"],
+      ["stats","Statistics","bootstrap CIs, fixed seed","process"],
+      ["figs","Thesis figures","each regenerated by a script","ui"] ]}
+  ]},
+  steps: [
+    ["Deploy a placement", "Every connector half is its own unit with its own database. One command per machine deploys Edge, Cloud or Hybrid, and the machine detects its own role.", ["run","pcp","pdp"]],
+    ["Publish the factory data", "The provider registers the crane's data (from a simulator and an Asset Administration Shell) as assets with usage policies and contract offers.", ["src","pcp"]],
+    ["Negotiate a contract", "The partner's Control Plane reads the catalog and negotiates an agreement, exactly as a real data-space partner would.", ["ccp","pcp"]],
+    ["Push transfer", "The provider's Data Plane fetches from the source and pushes to the partner, and the receiver timestamps each arrival.", ["pdp2","src","cdp","rcv"]],
+    ["Pull transfer", "The partner gets an access token and pulls repeatedly through the provider's Data Plane, at the rate each test case needs (50 Hz control, 1 Hz sensors, 24 Hz video).", ["cdp","pdp2","src"]],
+    ["Measure honestly", "Clocks are checked across machines, warm-up runs are excluded, and every number gets a bootstrap confidence interval. A no-connector baseline separates connector overhead from network limits.", ["clk","stats","figs"]]
+  ],
+  extra: "placement",
+  mine: [
+    "<b>Distributed deployment:</b> split the connectors into independently deployable units (one per Control Plane and Data Plane, each with its own Postgres), with placement profiles and timing profiles.",
+    "<b>Test cases TC1–TC4:</b> real-time control, high-frequency sensors, video stream and triggered alerts, plus a pull client, a payload sweep and a link-cut test for network outages.",
+    "<b>Measurement tooling:</b> a driver that runs a whole measurement set across four machines and collects metrics and container resource usage.",
+    "<b>Analysis:</b> Python statistics with fixed-seed bootstrap confidence intervals, and every figure and table in the results chapter regenerated by a script from a tagged release.",
+    "<b>Dashboards:</b> provider and consumer UIs (React, Vite, Tailwind) to watch negotiations and transfers live."
+  ],
+  team: [
+    "The first two-connector setup was prepared by colleagues at Fraunhofer ISST and Tampere University. The connector code builds on the Eclipse EDC Samples (Apache 2.0)."
+  ],
+  decisions: [
+    ["Architecture","Each connector half is its own unit","The Control Plane and Data Plane each get their own container and database, so changing the placement is a config file, not a code change. Databases are never published on the host."],
+    ["Portability","No shared Docker network","Units only talk through host addresses and published ports. The same wiring works whether two units share a laptop or sit in different clouds."],
+    ["Method","Measure a no-connector baseline","Measuring the same flows without EDC showed the 50 Hz control and video failures were the network's limit, not the connector's."],
+    ["Method","Test both push and pull","Push costs about 0.3 s per transfer, which is fine for occasional data. Pull adds only 5–15 ms per request once a contract exists, which suits streams."],
+    ["Rigor","Reproducible by construction","Warm-up runs excluded, clocks checked, fixed-seed statistics, and a tagged release that regenerates every figure and table."]
+  ],
+  metrics: [[540,"","/540","push transfers delivered"],[65000,"","+","pull requests, 0 errors"],[null,"+5–15 ms","","added by EDC pull for sensor data"],[4,""," machines","edge · cloud · source · partner"]],
+  verdicts: [
+    ["ok","Soft real-time monitoring","TC2 · vibration sensor, 1 Hz","Works in every placement with pull: about 60–70 ms per request and no missed deadlines."],
+    ["no","Hard real-time control","TC1 · 50 Hz closed loop, 20 ms deadline","Not possible over this network. The baseline without a connector also misses every deadline."],
+    ["no","Video stream","TC3 · 24 fps compressed frames","Not possible over this network. Even without a connector only about 3 frames per second got through."]
+  ],
+  outcomes: [
+    "The <b>Cloud</b> placement had rare long stalls: the slowest 5% of real-time control pushes took up to 4 s, and the worst one 15 s. Edge and Hybrid stayed under 0.6 s at the 95th percentile.",
+    "Where the Control Plane runs barely affects transfer speed. The Data Plane's location and the network path matter much more, which supports a Hybrid setup: govern in the cloud, move data at the edge.",
+    "Delivery was fully reliable: every push arrived with no retries, and every pull returned HTTP 200."
+  ],
+  stack: ["Java","Eclipse Dataspace Components","Gradle","Eclipse BaSyx (AAS)","MongoDB","PostgreSQL","Docker Compose","Bash","Python","Bootstrap statistics","React","Vite","Tailwind","CSC cPouta cloud"]
+},
+/* ------------------------------------------------------------------ TWINFLOW */
+{
+  id: "twinflow",
+  kicker: "Research · Digital twin",
+  title: "TwinFlow: a live digital twin control tower for factory intralogistics",
+  short: "TwinFlow digital twin control tower",
+  org: "AIIC Lab, Tampere University",
+  period: "Mar 2026 – Aug 2026",
+  cvLine: "Real-time data platform and digital twin for simulated factory logistics: MQTT → medallion lakehouse → live asset state, exceptions and an AI-agent interface.",
+  result: "Built end to end and demoed to industrial partners and on a factory visit; positive feedback",
+  tags: ["Python","FastAPI","MQTT","TimescaleDB","Redis","MCP"],
+  lead: "A Control Tower demonstrator for factory intralogistics, built to prove the whole data path before any real hardware is connected. Machine, robot and workstation data streams in, gets refined into a live digital twin, and anything out of range is raised as an exception. AI agents can also query the data safely.",
+  facts: [["Role","Research Assistant"],["Services","5 custom + 3 infrastructure"],["Deployment","Docker Compose on a cloud VM"]],
+  links: [],
+  problem: [
+    "Before connecting real machines and robots, the lab needed proof that one platform could carry data from the shop floor all the way to a live twin and real-time alerts.",
+    "Two use cases are simulated: <b>material reception &amp; storage</b> (warehouse events, robot task assignment, zone tracking) and <b>new production orders</b> (order creation, routing through workstations, quality tracking)."
+  ],
+  diagram: { lanes: [
+    { label: "Data pipeline: medallion layers", nodes: [
+      ["sim","Factory simulator","machines · AMRs · workstations","source"],
+      ["mqtt","MQTT broker","Mosquitto, QoS 1","process"],
+      ["bronze","Bronze","raw messages","store"],
+      ["silver","Silver","cleaned measurements &amp; events","store"],
+      ["gold","Gold","5-min KPIs &amp; quality","store"] ]},
+    { label: "Digital twin & control tower", nodes: [
+      ["dt","Digital twin","asset state + health score","process"],
+      ["exc","Exception engine","5 signals × warning/critical","ai"],
+      ["redis","Redis","hot-path cache","store"],
+      ["rep","Reporting API","one call per view","process"],
+      ["ui","Control Tower","live dashboard","ui"] ]},
+    { label: "AI access", nodes: [
+      ["agent","AI agent","asks questions in plain language","ai"],
+      ["mcp","MCP server","list_tables · run_sql","process"],
+      ["db","TimescaleDB","all layers + real pump data","store"] ]}
+  ]},
+  steps: [
+    ["The factory talks", "A simulator publishes machine, robot and workstation data over MQTT every 5 seconds and injects random anomalies (8%), so the alerting has real work to do.", ["sim","mqtt"]],
+    ["Raw → clean → KPIs", "The data platform stores every message in Bronze. Every 60 seconds it cleans them into Silver and aggregates Gold KPIs, which it caches in Redis.", ["mqtt","bronze","silver","gold","redis"]],
+    ["The twin updates", "Every 10 seconds the twin service reads Gold, computes a health score for each asset and updates its live state.", ["gold","dt","redis"]],
+    ["Exceptions fire", "The rule engine scans the last 2 minutes of measurements for temperature, pressure, vibration, uptime and battery, and raises warnings or critical exceptions. Stale ones auto-resolve after 15 minutes.", ["silver","exc"]],
+    ["People watch", "The Control Tower dashboard polls one reporting API through an nginx reverse proxy every 10 seconds.", ["rep","ui","redis"]],
+    ["Agents ask", "AI agents connect through an MCP server and can list tables and run read-only SQL, including predictive-maintenance analysis on real pump sensor data.", ["agent","mcp","db"]]
+  ],
+  mine: [
+    "<b>Built the demonstrator end to end:</b> the simulator, data platform, digital twin, reporting and dashboard services, and the Docker Compose deployment.",
+    "<b>Database design:</b> Bronze/Silver/Gold, digital twin, and catalog schemas with an asset registry and data lineage. Every table and column is documented in the database itself.",
+    "<b>MCP server for AI agents:</b> two tools (list tables, run SQL) with layered read-only protection, packaged so a researcher can connect from Claude Desktop or Claude Code.",
+    "<b>Predictive-maintenance dataset:</b> loaded real pump sensor data (220,320 minute readings, 52 sensors, 7 failures) and built an API that finds the sensors drifting more than 3σ in the 24 h, 6 h and 1 h before each failure."
+  ],
+  team: [],
+  decisions: [
+    ["Data","One TimescaleDB for every layer","PostgreSQL-compatible, with hypertables for time-series. Bronze, Silver, Gold, the twin and the catalog all live in one engine, so the MVP doesn't need several different databases."],
+    ["Data","Keep the raw layer","Bronze stores messages exactly as they arrived, so cleaning rules can change and history can be reprocessed."],
+    ["Performance","Cache the hot reads","Redis holds Gold aggregates for 5 minutes and asset state for 60 seconds, which takes the load of the dashboard's 10-second polling off the database."],
+    ["Testing","Simulate with anomalies, not static mocks","Random anomaly injection makes the exception engine fire for real, so the demo behaves like a live factory."],
+    ["Simplicity","No framework for the dashboard","Plain HTML/JS with Chart.js served by nginx: an image of about 10 MB, no build step, and nginx also acts as the reverse proxy for every API."],
+    ["Security","Read-only by design for AI agents","Each person has their own read-only login with a statement timeout and a connection cap. The database is never exposed publicly, and every query runs in a read-only transaction that is always rolled back."]
+  ],
+  metrics: [[5,""," s","simulator data interval"],[10,""," s","digital twin refresh"],[220320,"","","real pump readings for predictive maintenance"],[8,"","","services in one Compose stack"]],
+  outcomes: [
+    "Showed that data flows continuously from simulated shop-floor sources into a structured data lake and on to a live digital twin.",
+    "Exceptions are detected, classified and auto-resolved in real time. The medallion architecture works end to end on a single stack.",
+    "Gave researchers a safe, documented way to explore the data with AI agents, including a predictive-maintenance test on real failures.",
+    "<b>Demoed to industrial partners</b>, who gave positive feedback, and shown during a factory visit. It convinced them that with real factory data much more is possible."
+  ],
+  stack: ["Python 3.11","FastAPI","APScheduler","paho-mqtt","Mosquitto MQTT","TimescaleDB","PostgreSQL","Redis","nginx","Chart.js","Docker Compose","Model Context Protocol"]
+},
+/* ------------------------------------------------------------------ EDUCHAT */
+{
+  id: "educhat",
+  kicker: "AI · EdTech",
+  title: "EduChat: a Socratic AI tutor inside the university's course platform",
+  short: "EduChat: Socratic AI tutor",
+  org: "Tampere University",
+  period: "Aug 2025 – Mar 2026",
+  cvLine: "AI tutor embedded in the Plussa (A+) LMS. It grades free-text answers, guides with questions instead of answers, and runs on the university's own GPUs.",
+  result: "In production: COMP.CS.520 (165 students, 6 graded chat exercises) and COMP.CS.200",
+  tags: ["React","Django REST","pgvector","LangChain","Self-hosted LLM","LTI"],
+  lead: "Students open EduChat from inside their course page. Kiran, the AI tutor, asks them questions, grades their free-text answers and only uses material their teacher uploaded. The model runs on Tampere University's own servers, so student data never reaches a commercial AI provider.",
+  facts: [["Role","Product lead &amp; lead full stack developer"],["Courses","COMP.CS.520 · COMP.CS.200"],["Students","165 enrolled in COMP.CS.520"]],
+  links: [],
+  problem: [
+    "Generic chatbots hand students finished answers, can make things up, and send student data to commercial providers. Teachers can't see what students actually struggle with.",
+    "EduChat turns that around. The AI asks the questions and the student has to explain in their own words. Every reply is grounded in the teacher's own material, and the model runs on the university's own GPU servers."
+  ],
+  diagram: { lanes: [
+    { label: "Request path", nodes: [
+      ["aplus","Plussa / A+","LTI launch","ext"],
+      ["spa","React SPA","inside an iframe","ui"],
+      ["api","Django REST API","ASGI · per-app modules","process"],
+      ["lc","LangChain","prompts · RAG","process"],
+      ["llm","Self-hosted LLM","Llama 3.1 → Phi-4 14B","ai"] ]},
+    { label: "Course material pipeline", nodes: [
+      ["upload","Teacher upload","PDF · MD · HTML · JSON","source"],
+      ["worker","Background worker","parse + chunk 1000/100","process"],
+      ["embed","MiniLM-L6-v2","384-d embeddings on CPU","ai"],
+      ["pg","PostgreSQL + pgvector","one collection per exercise","store"] ]},
+    { label: "Graded exercise loop", nodes: [
+      ["q","Kiran asks","from the question bank","ui"],
+      ["ans","Student answers","free text","source"],
+      ["eval","LLM evaluation","correct · partial · incorrect","ai"],
+      ["next","Next move","hint · follow-up · next question","process"],
+      ["rep","Score + report","strengths &amp; gaps","ui"] ]}
+  ]},
+  steps: [
+    ["Student opens the exercise", "Plussa signs an LTI launch request. EduChat checks the signature, creates a session and an API token, syncs the student's courses and deep-links straight into the right exercise inside the iframe.", ["aplus","spa","api"]],
+    ["Teacher uploads course material", "Uploads return immediately. A background worker parses the file, splits it into overlapping chunks, embeds them on the CPU and stores them in a collection for that course, module and exercise.", ["upload","worker","embed","pg"]],
+    ["Kiran asks a question", "The tutor picks a question from the exercise's bank, adjusting difficulty to how the student has done so far.", ["q","api","lc","llm"]],
+    ["The answer is graded", "The LLM grades the free-text answer on meaning, not exact wording: correct, partial or incorrect.", ["ans","eval","llm"]],
+    ["Wrong? Ground the follow-up", "A partial answer gets a hint and up to 3 retries. An incorrect answer pulls the 5 most relevant chunks from this exercise's material, and Kiran asks a follow-up based on them.", ["eval","next","pg","lc"]],
+    ["Score and report", "The exercise ends with a final score and a report of strengths and areas to improve. Teachers see completions, score distributions and chat volume in the EduLens analytics.", ["rep","spa"]]
+  ],
+  mine: [
+    "<b>Exercise grading:</b> LLM evaluation of free-text answers, the hint-and-retry flow, and the final score and grading report used in COMP.CS.520's graded chat exercises.",
+    "<b>Single sign-on from Plussa (LTI):</b> signature validation, Django session and token, course sync, deep links into the right exercise. I also wrote its technical documentation.",
+    "<b>Product lead:</b> defined the architecture, split the work across the team, ran code reviews, added integration and end-to-end tests.",
+    "Designed the student–chatbot interaction analytics behind the teacher dashboard (EduLens).",
+    "Continued as Teaching Assistant / lead developer after the course project (Dec 2025 – Mar 2026).",
+    "Co-author of the paper <i>\"EduChat – a Socratic Tutor\"</i> (Niemelä et al., Tampere University, in preparation)."
+  ],
+  team: [
+    "The university's GPU infrastructure and the model benchmarking were run by the wider research team."
+  ],
+  decisions: [
+    ["Data","pgvector over FAISS and ChromaDB","We tested several options in a proof of concept. FAISS was quickest to set up, but PostgreSQL was already the main database. Storing vectors there meant one service fewer, no syncing between two stores, and transactional guarantees for the metadata."],
+    ["Isolation","One vector collection per exercise","Collections are scoped by course, module and exercise, so a student can only ever get context from their own teacher's material. Deleting a document also removes its embeddings, so outdated material stops shaping answers."],
+    ["Cost","Small embedding model on CPU","MiniLM-L6-v2 runs on the app server with no GPU. The GPU servers stay free for the language model."],
+    ["Portability","LLM behind an OpenAI-compatible API","LangChain talks to the university's own endpoint, and the model is a configuration setting. We moved from Llama 3.1 8B to Phi-4 14B for its stronger academic reasoning without changing code."],
+    ["Pedagogy","Three grading outcomes, not pass/fail","Partial answers get hints. Incorrect ones trigger retrieval of course material. Correct ones skip retrieval, which saves LLM context and response time."],
+    ["Resilience","Login never waits on course sync","The frontend gets its own EduChat token, and the Plussa token stays on the server. If the course sync with Plussa fails, the error is logged and the student still gets in."],
+    ["Pragmatism","WebSockets temporarily off","Inside the LMS iframe, the browser blocked the socket (a DOMException in insecure contexts). We switched it off and used REST so courses weren't blocked, and planned to switch it back on later."]
+  ],
+  metrics: [[165,"","","students enrolled in COMP.CS.520"],[6,"","","graded chat exercises"],[2,"","","university courses"],[3,"","","student-facing chat modes"]],
+  outcomes: [
+    "Feedback came from in-app pulse surveys and pre/post questionnaires. It leaned neutral to positive. Happy students mentioned better conceptual understanding, and unhappy ones mostly struggled with the module content itself.",
+    "Upgraded from Llama 3.1 8B to Phi-4 14B after benchmarking and student feedback. Capacity limits weren't reached during the courses.",
+    "Deployed with Docker Compose (Django on ASGI and PostgreSQL + pgvector), with GitLab CI building and testing every change."
+  ],
+  stack: ["React","TypeScript","Vite","MUI","Zustand","Django","Django REST Framework","PostgreSQL","pgvector","LangChain","Llama 3.1","Phi-4","HuggingFace","LTI","Docker Compose","GitLab CI","Vitest"]
+},
+/* ------------------------------------------------------------------ CROWNPEAK */
+{
+  id: "crownpeak",
+  kicker: "Enterprise CMS · .NET",
+  title: "Crownpeak DXM: keeping an enterprise CMS fast and reliable across many servers",
+  short: "Crownpeak DXM: enterprise CMS",
+  org: "Genweb2 · for Crownpeak",
+  period: "2022 – 2024",
+  cvLine: "Senior developer on Crownpeak's multi-tenant Digital Experience Management platform, a mature .NET codebase. My biggest piece of work was making compiled-template caching in Redis reliable across servers.",
+  result: "Redis compile cache: CPU spikes gone, unnecessary recompiles removed, faster publishing for customers moved to Redis",
+  tags: ["C# / .NET","Redis","Angular","SQL Server","Papertrail"],
+  lead: "Crownpeak DXM is a cloud CMS that enterprises, many in regulated industries, use to run their websites. Authors create content, approval workflows control what goes live, and developers write page templates in C# that the platform compiles and runs to render each page. As a senior developer I built features, fixed production bugs, modernised legacy parts of the code, and did my most complex work on the Redis caching behind template rendering.",
+  facts: [["Role","Senior developer"],["Codebase","Mature .NET platform with legacy modules"],["Platform","Multi-tenant SaaS: each customer isolated"]],
+  links: [["About Crownpeak DXM","https://www.crownpeak.com/"]],
+  problem: [
+    "<b>The domain.</b> Each customer gets an isolated tenant with its own content tree, users, permissions and settings. Content moves through a lifecycle: authors draft it, workflows route it for approval, developers' templates turn it into pages, editors preview the result, and publishing pushes it to live sites. Built-in quality checks help customers meet accessibility, privacy and brand rules.",
+    "<b>The hard part.</b> Templates are C# code compiled while the system runs. On a platform served by many web and publishing servers, compiled templates have to be shared, kept fresh and rebuilt safely. When that goes wrong, users see slow or failing previews, wrong versions, or several servers recompiling the same template at once and spiking CPU.",
+    "<b>The codebase.</b> A long-lived product mixing older .NET Framework and Classic ASP parts with newer .NET and Angular. Changes have to keep both old and new paths working for every customer."
+  ],
+  diagram: { lanes: [
+    { label: "The content lifecycle (what customers do)", nodes: [
+      ["author","Authors","create &amp; edit content","source"],
+      ["flow","Workflow","review &amp; approval","process"],
+      ["tpl","C# templates","written by customer developers","ai"],
+      ["prev","Preview","see the page before it goes live","ui"],
+      ["pub","Publishing","push to live sites","process"],
+      ["site","Live website","what visitors see","ext"] ]},
+    { label: "Where my Redis work sits (rendering a page)", nodes: [
+      ["req","Render request","preview or publish","source"],
+      ["check","Already compiled?","shared check","process"],
+      ["lock","One server compiles","others wait for it","ai"],
+      ["cache","Redis cache","per tenant, randomised expiry","store"],
+      ["run","Run the template","fast on every server","ui"] ]},
+    { label: "How I worked day to day", nodes: [
+      ["tix","Ticket","feature, bug or upgrade","ext"],
+      ["code","Build &amp; fix","old and new code paths","process"],
+      ["qa","Deploy to QA","verify before release","process"],
+      ["logs","Watch logs","Papertrail","ui"],
+      ["doc","Write it up","root cause + runbook","store"] ]}
+  ]},
+  steps: [
+    ["Content gets created", "Authors draft content in their tenant, and workflows route it for review and approval.", ["author","flow"]],
+    ["Templates turn content into pages", "Customer developers write templates in C#. The platform compiles them on demand and runs them to render previews and published pages.", ["tpl","prev","pub","site"]],
+    ["Is it already compiled?", "When a page renders, the server first checks the shared Redis cache. If the compiled template is there, it runs straight away on any server.", ["req","check","cache","run"]],
+    ["Only one server compiles", "If it isn't cached, one server takes a distributed lock and compiles while the others wait, then reuse the result. No CPU stampede.", ["check","lock","cache"]],
+    ["Expiry that doesn't stampede", "Cached templates expire at slightly randomised times, so they never all expire, and get recompiled, at the same moment.", ["cache"]],
+    ["Ship it safely", "Each change went through QA deployment and log monitoring in Papertrail, with the root cause and fix written up for the team.", ["tix","code","qa","logs","doc"]]
+  ],
+  mine: [
+    "<b>Redis compiled-template caching, my most complex work:</b> compiled templates live in a shared Redis cache with tenant-scoped keys, so every server reuses the same build. This removed a race where one server could delete a file another server was about to load.",
+    "<b>Distributed compile lock:</b> only one server compiles a given template at a time. I set the lock lease longer than the slowest cold compile, because a lease that expired mid-compile let a second server start a parallel compile and spike CPU.",
+    "<b>Resilience:</b> randomised (±20%) cache expiry to prevent mass recompiles, and treating any Redis error or open circuit breaker as \"not cached\", so the page recompiles safely instead of failing.",
+    "<b>Render bugs fixed:</b> a preview path that skipped the cache check and recompiled on every preview (causing timeouts), stale templates after library changes, and error pages that stayed cached after the problem was fixed.",
+    "<b>New features:</b> e.g. a Publishing Sessions report (.NET API + Angular) with paging, filtering, sorting and CSV export, built in both the newer and legacy API paths.",
+    "<b>Legacy upgrades:</b> updated the codebase to newer versions of its source, including old scripts and old plugins, without breaking existing customers.",
+    "<b>Operations:</b> monitored production and QA logs in Papertrail, investigated incidents to their root cause (e.g. publishing timeouts when parallel publishing overloaded the single-lane legacy renderer), and deployed builds to QA."
+  ],
+  team: [],
+  decisions: [
+    ["Caching","Shared Redis cache over per-server file copies","With files on a shared drive, one server could clean up a compiled template while another was about to load it. Keeping the compiled bytes in Redis until they expire removes that race entirely."],
+    ["Concurrency","A lock lease longer than the slowest compile","If the lease expires mid-compile, a second server starts compiling the same template and CPU spikes. The lease is sized for the slowest cold compile, and the wait limit is always longer than the lease."],
+    ["Scale","Randomised expiry (±20%)","Templates cached together would otherwise expire together and trigger a wave of recompiles on every server. Jitter spreads the expiry out."],
+    ["Resilience","Fail safe, not fail loud","If Redis is unreachable or the circuit breaker is open, the cache check answers \"not cached\" and the template recompiles. Users get a slower page instead of an error."],
+    ["Consistency","One cache check everywhere","Every \"is it compiled?\" question goes through the same cache abstraction. One preview path had bypassed it and recompiled on every request."],
+    ["Practice","Investigate before patching","For hard bugs I traced the behaviour through the code, wrote up the root cause, and ran live walkthroughs for the team before changing anything."]
+  ],
+  metrics: [[null,"0","","CPU spikes from parallel compiles"],[null,"1×","","compile per template, however many servers"],[null,"±20%","","randomised cache expiry"],[50000,"","","rows per CSV export in the new report"]],
+  outcomes: [
+    "<b>CPU spikes are gone:</b> servers no longer compile the same template in parallel.",
+    "<b>Customers moved to Redis mode</b>, which made their publishing noticeably faster.",
+    "<b>Unnecessary compilation removed:</b> previews and renders reuse compiled templates instead of rebuilding them.",
+    "Redis outages degrade to a slower page instead of a failed preview or publish. Customers also got new reporting on publishing activity."
+  ],
+  stack: ["C#",".NET / .NET Framework","ASP.NET","Classic ASP (legacy)","Entity Framework Core","SQL Server","Redis","Polly (retry + circuit breaker)","Angular","PrimeNG","RxJS","IIS","log4net","Papertrail","GitHub"]
+},
+/* ------------------------------------------------------------------ ARCADE */
+{
+  id: "arcade",
+  kicker: "Data · AI preparation",
+  title: "Arcade: turning messy scraped product data into AI-ready catalogs",
+  short: "Arcade: AI data mastering",
+  org: "Genweb2",
+  period: "Sep 2021 – Jan 2023",
+  cvLine: "A product I built end to end: it cleans, deduplicates and clusters scraped product data so AI models can use it, and keeps a small annotation team fully busy. Spring Boot, ActiveMQ, Angular, AWS.",
+  result: "~10,000 products clustered every day by a team of just 5 annotators",
+  tags: ["Java 11","Spring Boot","ActiveMQ","Angular 13","AWS"],
+  lead: "Product data scraped from the web is full of duplicates, inconsistent names and missing fields. Arcade cleans it, groups listings of the same item into clusters, and hands the clusters to human annotators to confirm. The result is a consistent catalog that AI models can learn from. I built the whole product.",
+  facts: [["Role","Senior Software Engineer"],["Ownership","Built end to end"],["Hosting","AWS EC2 + S3"]],
+  links: [],
+  problem: [
+    "Raw scraped data can't be used for AI as it is. It has to be sanitised and clustered first, at a volume people can't handle by hand.",
+    "The second problem was people. A small annotation team confirms the clusters, and any time an annotator spends waiting for their next batch is lost throughput."
+  ],
+  diagram: { lanes: [
+    { label: "Processing path", nodes: [
+      ["scr","Scraped data","online product listings","source"],
+      ["api","Spring Boot API","JWT · Swagger","process"],
+      ["mq","ActiveMQ","async jobs","process"],
+      ["clean","Clean &amp; cluster","dedupe · group items","ai"],
+      ["db","MySQL 8 + S3","catalog + files","store"] ]},
+    { label: "Human in the loop", nodes: [
+      ["assign","Auto-assignment","work distributed automatically","ai"],
+      ["ann","5 annotators","Angular 13 review UI","ui"],
+      ["ok","Confirmed clusters","~10,000 products a day","store"] ]},
+    { label: "Delivery & monitoring", nodes: [
+      ["ci","GitLab CI/CD","build · test","ext"],
+      ["img","Docker images","GitLab Runner","process"],
+      ["ec2","AWS EC2","production","store"],
+      ["mon","Prometheus + Grafana","Actuator · Node Exporter","ui"] ]}
+  ]},
+  steps: [
+    ["Ingest", "Scraped product data arrives through the Spring Boot REST API, which is secured with JWT and documented with Swagger.", ["scr","api"]],
+    ["Queue the heavy work", "Cleaning jobs go onto ActiveMQ, so the API stays responsive during large imports.", ["api","mq"]],
+    ["Clean and cluster", "Records are sanitised, deduplicated and grouped into clusters of the same product. Results go to MySQL, and files go to S3.", ["mq","clean","db"]],
+    ["Auto-assign the work", "Clusters are distributed to annotators automatically, so nobody ever waits for their next assignment.", ["db","assign","ann"]],
+    ["Confirm at scale", "Five annotators review and confirm about 10,000 products a day in the Angular review interface.", ["ann","ok"]],
+    ["Ship and watch", "GitLab CI/CD builds Docker images and deploys them to EC2. Prometheus and Grafana track application and host health.", ["ci","img","ec2","mon"]]
+  ],
+  mine: [
+    "<b>Built the whole product myself:</b> backend APIs, clustering logic, the Angular review interface, CI/CD and monitoring.",
+    "<b>Automatic work distribution:</b> annotators get new clusters as soon as they finish, so a team of 5 keeps up with about 10,000 products a day.",
+    "<b>Clustering pipeline:</b> asynchronous cleaning and clustering on ActiveMQ, with results in MySQL and files in S3.",
+    "<b>Delivery and operations:</b> GitLab CI/CD to Docker on AWS EC2, plus Prometheus, Grafana and Node Exporter monitoring."
+  ],
+  team: [],
+  decisions: [
+    ["People","Push work to annotators automatically","Instead of annotators picking batches, the system hands out the next cluster as soon as one is done. No idle time, so a team of five handles about 10,000 products a day."],
+    ["Architecture","Message queue between API and processing","Heavy cleaning and clustering run asynchronously on ActiveMQ, so imports don't block users."],
+    ["Operations","Observability from day one","Spring Actuator metrics went to Prometheus, with Grafana dashboards and Node Exporter for host health."],
+    ["Delivery","Fully automated deploys","GitLab CI/CD built Docker images and deployed them to EC2 through GitLab Runner. Frontend assets were pre-compressed with gzipper."]
+  ],
+  metrics: [[10000,"~","","products clustered per day"],[5,"","","annotators, never waiting for work"]],
+  outcomes: [
+    "About 10,000 products were clustered and confirmed every day with only five annotators.",
+    "Automatic assignment removed annotator idle time completely."
+  ],
+  stack: ["Java 11","Spring Boot","JPA / Hibernate","ActiveMQ","MySQL 8","Angular 13","TypeScript","AWS EC2","AWS S3","Docker","GitLab CI/CD","Prometheus","Grafana","Swagger"]
+},
+/* ------------------------------------------------------------------ EMPORIA */
+{
+  id: "emporia",
+  kicker: "Accessibility · Public",
+  title: "EMPORIA: an accessible learning and job platform for people with disabilities",
+  short: "EMPORIA: accessible learning &amp; jobs",
+  org: "Genweb2 · Public project",
+  period: "Feb 2019 – Apr 2022",
+  cvLine: "People with disabilities take courses through assistive technology, earn certificates and apply for jobs. Employers post jobs and browse a CV bank. I worked mainly on the job portal, CV bank and certificates.",
+  result: "1,200+ users with disabilities completed courses and applied for jobs independently",
+  tags: ["Java","Angular 8","WCAG","MySQL"],
+  lead: "A public platform where people with disabilities can learn, get certified and find work, using screen readers, keyboard navigation and other assistive tools.",
+  facts: [["Role","Senior Software Engineer"],["Standard","WCAG"],["Users","1,200+ learners with disabilities"]],
+  links: [],
+  problem: ["Most learning and job portals are unusable with assistive technology. EMPORIA was designed around accessibility from the start, and connects learning directly to getting hired."],
+  diagram: { lanes: [
+    { label: "Platform", nodes: [
+      ["user","Learner","screen reader · keyboard","source"],
+      ["ui","Angular 8 UI","WCAG-compliant","ui"],
+      ["api","Java REST API","Swagger · Tomcat","process"],
+      ["db","MySQL","MyBatis","store"] ]},
+    { label: "Learner journey", nodes: [
+      ["course","Courses","enrol &amp; learn","process"],
+      ["cert","Certificates","earned on completion","ai"],
+      ["cv","CV bank","profile grows","store"],
+      ["jobs","Job portal","apply · get hired","ui"],
+      ["emp","Employers","post jobs · find talent","ext"] ]}
+  ]},
+  steps: [
+    ["Access", "Learners use the platform with assistive tools, and the Angular UI is built to WCAG.", ["user","ui"]],
+    ["Learn", "Learners enrol in online courses and complete them.", ["course","api","db"]],
+    ["Certify", "Finishing a course earns a certificate that is added to the learner's profile in the CV bank.", ["cert","cv"]],
+    ["Get hired", "Employers post jobs on the job portal and search the CV bank. Learners apply directly.", ["cv","jobs","emp"]]
+  ],
+  mine: [
+    "Worked across the platform, mainly on the <b>job portal</b>, the <b>CV bank</b> and <b>certificates</b>.",
+    "Built WCAG-compliant interfaces together with UX designers."
+  ],
+  team: [],
+  decisions: [
+    ["Accessibility","Accessibility as a requirement, not a polish step","Semantic markup, full keyboard navigation and screen-reader labels were checked as part of every feature."],
+    ["Product","Certificates feed the CV","Completed courses automatically strengthen the learner's profile that employers see."]
+  ],
+  metrics: [[1200,"","+","learners with disabilities served"]],
+  outcomes: ["More than 1,200 users with disabilities completed courses and applied for jobs on their own."],
+  stack: ["Java","Angular 8","MySQL","MyBatis","Maven","Tomcat","Swagger","WCAG"]
+},
+/* ------------------------------------------------------------------ DNC */
+{
+  id: "dnc",
+  kicker: "Gov-tech · Law enforcement",
+  title: "NIMS: the national system behind Bangladesh's fight against drugs",
+  short: "NIMS: Narcotics Control (DNC)",
+  org: "Genweb2 · Govt. of Bangladesh",
+  period: "Jul 2018 – Mar 2022",
+  cvLine: "Narcotics Information Management System for the Department of Narcotics Control: licensing, anti-drug operations, sample analysis, court cases and patient treatment in one national system. I worked on every module.",
+  result: "The department's core system for drug control across the country; automated reporting cut manual effort by 85%",
+  tags: ["Java","AngularJS","WebLogic","Crystal Reports"],
+  lead: "NIMS (Narcotics Information Management System) runs the Department of Narcotics Control's work nationwide. It licenses controlled substances, tracks anti-drug operations, records lab analysis of seized samples, follows cases through the courts, and manages treatment and rehabilitation of patients.",
+  facts: [["Role","Software Engineer"],["Client","Department of Narcotics Control (DNC)"],["Scope","Nationwide · all modules"]],
+  links: [],
+  problem: [
+    "Drug control involves many offices and steps: licensing legal use of controlled substances, enforcement operations, lab analysis, court proceedings and patient rehabilitation. On paper, these records were scattered and hard to follow.",
+    "NIMS brings them into one system, so the department can follow a case from operation to verdict and see the national picture."
+  ],
+  diagram: { lanes: [
+    { label: "Enforcement chain", nodes: [
+      ["ops","Operation management","anti-drug operations","source"],
+      ["sample","Sample analysis","lab records of seized samples","ai"],
+      ["court","Court case management","legal proceedings","process"],
+      ["rep","Reports","Crystal Reports · automated","ui"] ]},
+    { label: "Regulation & care (separate modules)", noflow: true, nodes: [
+      ["lic","Licensing management","controlled-substance licences","process"],
+      ["pat","Patient management","treatment &amp; rehabilitation","store"] ]},
+    { label: "Platform", nodes: [
+      ["off","Officers &amp; applicants","web + mobile","source"],
+      ["ui","AngularJS UI","module per office","ui"],
+      ["api","Java services","WebLogic","process"],
+      ["sign","SafeNet tokens","secure sign-off","ai"],
+      ["db","National database","all modules","store"] ]}
+  ]},
+  steps: [
+    ["Operations", "Anti-drug operations and enforcement activities are recorded as they happen.", ["ops","off","ui"]],
+    ["Lab analysis", "Seized samples are analysed, and the results are recorded digitally and linked to the case.", ["sample"]],
+    ["Court cases", "Narcotics-related cases are tracked through their legal proceedings.", ["court"]],
+    ["Licensing", "Licences for controlled substances and drugs are applied for, issued and overseen in one place.", ["lic","off"]],
+    ["Patients", "Records of patients in treatment and rehabilitation are managed alongside enforcement data.", ["pat"]],
+    ["Secure and report", "Official actions are secured with SafeNet tokens, and reports are generated automatically, cutting manual effort by 85%.", ["sign","db","rep"]]
+  ],
+  mine: [
+    "<b>Worked on every module:</b> court case management, licensing, sample analysis, operation management and patient management.",
+    "<b>Automated reporting</b> that replaced manual report preparation and cut the effort by 85%."
+  ],
+  team: [],
+  decisions: [
+    ["Security","SafeNet tokens for official actions","Licences and case actions carry legal weight, so official sign-off is secured with hardware tokens."],
+    ["Reporting","Crystal Reports for official output","The department relied on print-ready official report formats, so reports were generated in exactly those formats."],
+    ["Design","One national database across modules","Operations, lab results, court cases, licences and patients live in one system, so a case can be followed end to end."]
+  ],
+  metrics: [[85,"","%","less manual reporting effort"],[5,"",""," core modules, all of which I worked on"]],
+  outcomes: [
+    "Became the Department of Narcotics Control's core system for controlling drugs across Bangladesh.",
+    "Automated reporting reduced manual effort by 85%."
+  ],
+  stack: ["Java","AngularJS","MyBatis","MySQL","WebLogic","Crystal Reports","SafeNet","REST"]
+}
+];
+
+const EXPERIENCE = [
+  ["Mar 2026 – Aug 2026","Research Assistant: Distributed Systems &amp; Industrial Dataspaces","Tampere University",["Built the TwinFlow digital twin demonstrator and investigated cloud–edge integration for industrial data exchange."],["twinflow","edc-thesis"],[]],
+  ["Dec 2025 – Mar 2026","Teaching Assistant / Lead Developer, EduChat","Tampere University",["Led full stack development of the AI tutor used in university courses and guided students on the codebase."],["educhat"],[]],
+  ["Aug 2021 – Aug 2024","Senior Software Engineer","Genweb2 · Dhaka",["Led full stack delivery with Java, Spring Boot, C#/.NET, Angular and TypeScript, from requirements to CI/CD on AWS.","Monitored production with Grafana, Prometheus, Kibana and Papertrail. Ran code reviews and mentored junior developers."],["crownpeak","arcade","emporia"],[]],
+  ["Apr 2017 – Jul 2021","Software Engineer","Genweb2 · Dhaka",["Built public-sector systems with Spring Boot, Angular, Laravel and PHP. Automated reporting and improved workflows for government clients."],["dnc"],["FAMS","E-Court Service","eMobile Court"]],
+  ["Feb 2015 – Apr 2017","Software Engineer","Right Brain Solution · Dhaka",["Gathered requirements with clients and built government web applications in Symfony and Drupal."],[],["Digital Land Record System","Teachers Portal of Bangladesh","Land Lease Management"]]
+];
+
+const EARLIER = [
+  ["FAMS: Foreign Aid Management System","Genweb2","National system for the Economic Relations Division tracking foreign-aided projects, from borrowing plans to disbursements, currency conversion and reconciliation with development partners. Java, Spring Boot, MyBatis, Angular."],
+  ["E-Court Service","Genweb2 · 2017–2019","A unified e-court system for mobile, appeal and certificate courts. PHP, Phalcon, Laravel."],
+  ["eMobile Court","Genweb2 · 2017–2019","National mobile court management. Improved case workflows. PHP, Phalcon."],
+  ["Digital Land Record System","Right Brain · 2015–2016","Government land-record portal. Built REST APIs and integrations. Symfony 2.8, Oracle, Redis."],
+  ["Teachers Portal of Bangladesh","Right Brain · 2015–2016","National portal for public-school teachers to share content. Drupal, PHP."],
+  ["Land Lease Management","Right Brain · 2016–2017","Designed the database and workflow, and built the core modules. Symfony2, MySQL."]
+];
+
+const SKILLS = [
+  ["Backend","Java, Spring Boot, Spring MVC, JPA/Hibernate, MyBatis, REST, JMS/ActiveMQ, Python, Django REST Framework, FastAPI, PHP/Laravel"],
+  [".NET","C#, .NET / .NET Core, .NET Framework, ASP.NET, Entity Framework Core, IIS"],
+  ["Frontend","Angular, TypeScript, React, Next.js, Vite, Tailwind, accessible UI (WCAG)"],
+  ["Data","Microsoft SQL Server (MSSQL), PostgreSQL, MySQL, Oracle, TimescaleDB, pgvector, Redis, MongoDB, Elasticsearch, MQTT"],
+  ["Cloud &amp; ops","Docker, AWS (EC2, S3), CSC cPouta, GitLab CI, GitHub Actions, Jenkins, Prometheus, Grafana, Kibana, Papertrail"],
+  ["AI","RAG (LangChain, pgvector), LLM grading &amp; tutoring, self-hosted models, MCP servers for AI agents"],
+  ["Data spaces","Eclipse Dataspace Components, Asset Administration Shell (BaSyx), cloud–edge deployment"],
+  ["Languages","English (C1–C2), Finnish (intermediate), Bengali (native)"]
+];
+
+
+const EDUCATION = [
+  ["Aug 2024 – present","MSc, Software, Web &amp; Cloud","Tampere University · Thesis: <i>Deploying Data Space Connectors on the Cloud Continuum for Manufacturing</i>"],
+  ["2010 – 2014","BSc, Electronic &amp; Telecommunication Engineering","Southeast University, Dhaka · GPA 3.82 / 4.00"]
+];
+
+/* =====================================================================
+   Component helpers
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const byId = id => PROJECTS.find(p => p.id === id);
+const fmt = n => n.toLocaleString("en-US");
+const plain = s => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&");
+const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function Diagram(d) {
+  let delay = 0;
+  const lanes = d.lanes.map(l => {
+    const parts = [];
+    l.nodes.forEach((n, i) => {
+      if (i && l.noflow) parts.push(`<span class="gap"></span>`);
+      else if (i) parts.push(`<span class="conn" aria-hidden="true"><i style="--d:${((delay += .27) % 1.6).toFixed(2)}s"></i></span>`);
+      parts.push(`<div class="node k-${n[3]}" data-node="${n[0]}"><b>${n[1]}</b><small>${n[2]}</small></div>`);
+    });
+    return `<div class="lane"><div class="lane-label">${l.label}</div><div class="lane-row">${parts.join("")}</div></div>`;
+  }).join("");
+  const kinds = [["source","Source"],["process","Service"],["store","Storage"],["ai","AI / core logic"],["ui","User-facing"],["ext","External"]];
+  const legend = kinds.map(k => `<span><i style="background:var(--k-${k[0]});border-color:var(--k-${k[0]}-b)"></i>${k[1]}</span>`).join("");
+  return `<div class="diagram">${lanes}</div><div class="legend">${legend}</div>`;
+}
+
+function Walkthrough(p) {
+  const steps = p.steps.map((s, i) => `<li><button class="step" type="button" data-i="${i}"><span class="n">${i + 1}</span><span>${plain(s[0])}</span></button></li>`).join("");
+  return `<div class="walk">
+    <div><ol class="steps">${steps}</ol>
+      <button class="pill-btn primary play" type="button" data-play>▶ Play walkthrough</button></div>
+    <div><div class="step-panel"><div class="fade"><h3>Click a step, or press play</h3><p>Each step highlights the parts of the diagram involved, so you can follow the data through the system.</p></div></div>
+      <div class="progress"><i></i></div></div>
+  </div>`;
+}
+
+function Placement() {
+  return `<section class="block reveal">
+    <h2>Try the three placements</h2>
+    <p class="sub">Only the provider's Control Plane (CP) and Data Plane (DP) move. Pick a placement and watch where they go.</p>
+    <div class="tabs" role="tablist">
+      <button type="button" data-arch="edge">Edge</button>
+      <button type="button" data-arch="hybrid" class="on">Hybrid</button>
+      <button type="button" data-arch="cloud">Cloud</button>
+    </div>
+    <div class="zones">
+      <div class="zone edge"><h4>Factory edge</h4><small>edge server + the machine's data source</small><div class="slot" data-zone="edge"></div></div>
+      <div class="zone cloud"><h4>Provider cloud</h4><small>CSC cPouta</small><div class="slot" data-zone="cloud"></div></div>
+      <div class="zone partner"><h4>External partner</h4><small>a separate hosting provider</small><div class="slot" data-zone="partner"></div></div>
+    </div>
+    <p class="pcap" data-cap></p>
+  </section>`;
+}
+const ARCH = {
+  edge:   { cp: "edge",  dp: "edge",  cap: "<b>Edge:</b> everything stays at the factory. Data only leaves the site to reach the partner, but the factory has to operate the whole connector." },
+  hybrid: { cp: "cloud", dp: "edge",  cap: "<b>Hybrid:</b> contracts and policies are managed in the cloud, while the data moves straight from the edge. In the measurements it kept Edge's stable tail latency." },
+  cloud:  { cp: "cloud", dp: "cloud", cap: "<b>Cloud:</b> easiest to operate, but every byte crosses the factory-to-cloud link. Its median was fine, but it had the rare long stalls (up to 4 s at p95, 15 s worst case)." }
+};
+function setArch(a, animate) {
+  const apply = () => {
+    $$(".slot").forEach(s => s.innerHTML = "");
+    $('[data-zone="edge"]').insertAdjacentHTML("beforeend", `<span class="zchip fixed">Data source (crane + AAS)</span>`);
+    $('[data-zone="partner"]').insertAdjacentHTML("beforeend", `<span class="zchip fixed">Consumer CP + DP</span>`);
+    $(`[data-zone="${ARCH[a].cp}"]`).insertAdjacentHTML("beforeend", `<span class="zchip cp" style="view-transition-name:chip-cp">Provider CP</span>`);
+    $(`[data-zone="${ARCH[a].dp}"]`).insertAdjacentHTML("beforeend", `<span class="zchip dp" style="view-transition-name:chip-dp">Provider DP</span>`);
+    $("[data-cap]").innerHTML = ARCH[a].cap;
+    $$("[data-arch]").forEach(b => b.classList.toggle("on", b.dataset.arch === a));
+  };
+  if (animate && document.startViewTransition && !reduced()) document.startViewTransition(apply);
+  else apply();
+}
+
+function Metrics(list) {
+  if (!list.length) return "";
+  return `<div class="metrics">${list.map(([num, text, suffix, label]) => {
+    const val = num == null ? text : `<span data-count="${num}" data-suffix="${suffix}">0${suffix}</span>`;
+    return `<div class="metric"><b>${val}</b><span>${label}</span></div>`;
+  }).join("")}</div>`;
+}
+
+/* =====================================================================
+   Views
+   ===================================================================== */
+function CVView() {
+  const P = PROFILE;
+  const projects = PROJECTS.map(p => `
+    <div class="prow" tabindex="0" role="link" data-go="${p.id}" aria-label="Open case study: ${plain(p.short)}">
+      <div class="t"><span style="view-transition-name:t-${p.id}">${p.short}</span><span class="kicker">${p.kicker}</span></div>
+      <div class="when">${p.period}</div>
+      <div class="d">${p.cvLine}</div>
+      <div class="res">${p.result}</div>
+      <div class="tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+      <span class="go">Open case study →</span>
+    </div>`).join("");
+  const jobs = EXPERIENCE.map(j => `
+    <div class="job"><div class="when">${j[0]}</div>
+      <div class="what"><b>${j[1]}</b><span>${j[2]}</span>
+        <ul>${j[3].map(x => `<li>${x}</li>`).join("")}</ul>
+        ${(j[4].length || j[5].length) ? `<div class="mini-links">${j[4].map(id => `<a href="#/p/${id}">${byId(id).short} →</a>`).join("")}${j[5].map(n => `<span>${n}</span>`).join("")}</div>` : ""}
+      </div></div>`).join("");
+  return `<article class="paper view">
+    <header class="cv-head">
+      <div>
+        <h1>${P.name}<span class="dot">.</span></h1>
+        <div class="role">${P.role}</div>
+        <div class="contacts">
+          <span>${P.location}</span>
+          <a href="mailto:${P.email}">${P.email}</a>
+          <a href="${P.linkedin}" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="${P.github}" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="head-actions">
+          <a class="pill-btn primary" href="mailto:${P.email}">Contact me</a>
+          <button class="pill-btn no-print" type="button" onclick="window.print()">Print / save as PDF</button>
+        </div>
+      </div>
+      <div class="portrait" aria-hidden="false">
+        <span class="p-stripes"></span>
+        <span class="p-ring"></span>
+        <div class="p-photo">
+          <img class="p-duo" src="${P.photo}" alt="Portrait of ${P.name}" width="700" height="700">
+          <img class="p-real" src="${P.photo}" alt="" width="700" height="700">
+        </div>
+        <span class="p-spark"></span><span class="p-spark s2"></span>
+      </div>
+    </header>
+
+    <section class="cv-sec"><h2>Profile</h2><p class="summary">${P.summary}</p></section>
+
+    <section class="cv-sec"><h2>Highlighted projects</h2>
+      ${projects}
+    </section>
+
+    <section class="cv-sec"><h2>Experience</h2>${jobs}</section>
+
+    <section class="cv-sec"><h2>More work</h2>
+      <div class="earlier">${EARLIER.map(e => `<div><b>${e[0]}</b><span>${e[1]}</span><p>${e[2]}</p></div>`).join("")}</div>
+    </section>
+
+    <section class="cv-sec"><h2>Skills</h2>
+      <dl class="skills">${SKILLS.map(s => `<dt>${s[0]}</dt><dd>${s[1]}</dd>`).join("")}</dl>
+    </section>
+
+    <section class="cv-sec"><h2>Education</h2>
+      ${EDUCATION.map(e => `<div class="job"><div class="when">${e[0]}</div><div class="what"><b>${e[1]}</b><span>${e[2]}</span></div></div>`).join("")}
+    </section>
+  </article>
+  <footer class="foot">© 2026 ${P.name} · Finland</footer>`;
+}
+
+function ProjectView(p) {
+  const i = PROJECTS.indexOf(p);
+  const prev = PROJECTS[(i - 1 + PROJECTS.length) % PROJECTS.length];
+  const next = PROJECTS[(i + 1) % PROJECTS.length];
+  const links = p.links.map(l => `<a class="pill-btn primary" href="${l[1]}" target="_blank" rel="noopener">${l[0]} ↗</a>`).join("");
+  const verdicts = p.verdicts ? `<section class="block reveal"><h2>Which factory data flows can go through a connector?</h2>
+    <p class="sub">Verdicts per data-flow class, using pull transfers.</p>
+    <div class="verdicts">${p.verdicts.map(v => `<div class="verdict ${v[0]}"><span class="tag2">${v[0] === "ok" ? "✓ Works" : "✕ Network-limited"}</span><h4>${v[1]}</h4><small style="color:var(--faint)">${v[2]}</small><p>${v[3]}</p></div>`).join("")}</div></section>` : "";
+  return `<div class="view">
+  <div class="topbar">
+    <a class="back" href="#/">← Back to CV</a>
+    <span class="crumb">Projects / ${p.short}</span>
+  </div>
+  <article class="detail">
+    <header class="hero">
+      <span class="blob"></span><span class="blob b2"></span>
+      <span class="kicker">${p.kicker}</span>
+      <h1 style="view-transition-name:t-${p.id}">${p.title}</h1>
+      <p class="lead">${p.lead}</p>
+      <div class="facts">
+        <div class="fact"><small>Organisation</small><span>${p.org}</span></div>
+        <div class="fact"><small>Period</small><span>${p.period}</span></div>
+        ${p.facts.map(f => `<div class="fact"><small>${f[0]}</small><span>${f[1]}</span></div>`).join("")}
+      </div>
+      ${links ? `<div class="links">${links}</div>` : ""}
+    </header>
+
+    <section class="block reveal prose"><h2>The problem</h2><p class="sub">Why this system exists.</p>${p.problem.map(x => `<p>${x}</p>`).join("")}</section>
+
+    <section class="block reveal"><h2>How it works</h2>
+      <p class="sub">The moving dots show data flowing through the system. Use the walkthrough to light up each part.</p>
+      ${Diagram(p.diagram)}
+      ${Walkthrough(p)}
+    </section>
+
+    ${p.extra === "placement" ? Placement() : ""}
+
+    <div class="two" style="margin-top:18px">
+      <section class="block reveal"><h2>What I built</h2><p class="sub">My own contributions${p.team.length ? ", and credit where it's due" : ""}.</p>
+        <ul class="contrib">${p.mine.map(x => `<li><span class="c">${x}</span></li>`).join("")}${p.team.map(x => `<li class="team"><span class="c">${x}</span></li>`).join("")}</ul>
+      </section>
+      <section class="block reveal"><h2>Results</h2><p class="sub">What happened in production.</p>
+        ${Metrics(p.metrics)}
+        <ul class="contrib">${p.outcomes.map(x => `<li><span class="c">${x}</span></li>`).join("")}</ul>
+      </section>
+    </div>
+
+    ${verdicts}
+
+    <section class="block reveal"><h2>Key technical decisions</h2><p class="sub">Click a card to see the reasoning.</p>
+      <div class="decisions">${p.decisions.map(d => `<div class="dec" tabindex="0" role="button" aria-expanded="false"><span class="plus">+</span><span class="lbl">${d[0]}</span><h3>${d[1]}</h3><div class="why"><div>${d[2]}</div></div></div>`).join("")}</div>
+    </section>
+
+    <section class="block reveal"><h2>Tech stack</h2><div class="chips" style="margin-top:12px">${p.stack.map(s => `<span class="chip">${s}</span>`).join("")}</div></section>
+
+    <nav class="pager">
+      <a href="#/p/${prev.id}"><small>← Previous</small><b>${prev.short}</b></a>
+      <a class="next" href="#/p/${next.id}"><small>Next →</small><b>${next.short}</b></a>
+    </nav>
+  </article>
+  <footer class="foot"><a href="#/">← Back to CV</a></footer>
+  </div>`;
+}
+
+/* =====================================================================
+   Behaviour (runs after each render)
+   ===================================================================== */
+let playTimer = null;
+function hydrate() {
+  // reveal on scroll
+  const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); countUp(e.target); }
+  }), { threshold: .1 }) : null;
+  $$(".reveal").forEach(el => io ? io.observe(el) : (el.classList.add("in"), countUp(el)));
+
+  // project rows: ripple, then navigate
+  $$(".prow").forEach(row => {
+    const go = e => {
+      if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      const r = row.getBoundingClientRect(), s = Math.max(r.width, r.height);
+      const cx = e.clientX || r.left + r.width / 2, cy = e.clientY || r.top + r.height / 2;
+      row.insertAdjacentHTML("beforeend", `<span class="ripple" style="width:${s}px;height:${s}px;left:${cx - r.left - s / 2}px;top:${cy - r.top - s / 2}px"></span>`);
+      setTimeout(() => { location.hash = "#/p/" + row.dataset.go; }, 140);
+    };
+    row.addEventListener("click", go);
+    row.addEventListener("keydown", go);
+  });
+
+  // portrait drifts gently with the mouse
+  const portrait = $(".portrait");
+  if (portrait && !reduced() && matchMedia("(pointer:fine)").matches) {
+    onmousemove = e => {
+      portrait.style.setProperty("--mx", ((e.clientX / innerWidth) - .5).toFixed(3));
+      portrait.style.setProperty("--my", ((e.clientY / innerHeight) - .5).toFixed(3));
+    };
+  } else onmousemove = null;
+
+  // decision cards
+  $$(".dec").forEach(d => {
+    const t = () => d.setAttribute("aria-expanded", d.classList.toggle("open"));
+    d.addEventListener("click", t);
+    d.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t(); } });
+  });
+
+  // walkthrough
+  const r = route();
+  if (r.view !== "project") return;
+  const p = byId(r.id);
+  const diagram = $(".diagram"), panel = $(".step-panel"), bar = $(".progress i"), playBtn = $("[data-play]");
+  let cur = -1;
+  const show = i => {
+    cur = i;
+    const s = p.steps[i];
+    $$(".step").forEach(b => b.classList.toggle("on", +b.dataset.i === i));
+    diagram.classList.add("focus");
+    $$(".node", diagram).forEach(n => n.classList.toggle("hl", s[2].includes(n.dataset.node)));
+    panel.innerHTML = `<div class="fade"><h3>${i + 1}. ${s[0]}</h3><p>${s[1]}</p></div>`;
+  };
+  const stop = () => { clearInterval(playTimer); playTimer = null; playBtn.textContent = "▶ Play walkthrough"; bar.classList.remove("run"); };
+  $$(".step").forEach(b => b.addEventListener("click", () => { stop(); show(+b.dataset.i); }));
+  playBtn.addEventListener("click", () => {
+    if (playTimer) return stop();
+    const tick = () => {
+      show((cur + 1) % p.steps.length);
+      bar.classList.remove("run"); void bar.offsetWidth; bar.style.setProperty("--t", "4.2s"); bar.classList.add("run");
+    };
+    tick(); playTimer = setInterval(tick, 4200);
+    playBtn.textContent = "❚❚ Pause";
+  });
+  if ($("[data-arch]")) {
+    $$("[data-arch]").forEach(b => b.addEventListener("click", () => setArch(b.dataset.arch, true)));
+    setArch("hybrid", false);
+  }
+}
+
+function countUp(scope) {
+  $$("[data-count]", scope).forEach(el => {
+    const end = +el.dataset.count, suf = el.dataset.suffix || "";
+    if (reduced()) { el.textContent = fmt(end) + suf; return; }
+    const t0 = performance.now(), dur = 1300;
+    const f = t => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(Math.round(end * e)) + suf; if (k < 1) requestAnimationFrame(f); };
+    requestAnimationFrame(f);
+  });
+}
+
+/* =====================================================================
+   Router (hash based, so it works on GitHub Pages without config)
+   ===================================================================== */
+function route() {
+  const m = location.hash.match(/^#\/p\/([\w-]+)/);
+  return m && byId(m[1]) ? { view: "project", id: m[1] } : { view: "cv" };
+}
+let cvScroll = 0, last = route().view;
+function render() {
+  clearInterval(playTimer); playTimer = null;
+  const r = route();
+  $("#app").innerHTML = r.view === "cv" ? CVView() : ProjectView(byId(r.id));
+  document.title = r.view === "cv" ? "Pranab Sarker — Full Stack Engineer" : plain(byId(r.id).short) + " — Pranab Sarker";
+  hydrate();
+}
+function navigate() {
+  const r = route();
+  const back = r.view === "cv";
+  if (!back && last === "cv") cvScroll = scrollY;
+  document.documentElement.dataset.nav = back ? "back" : "forward";
+  const done = () => { render(); scrollTo({ top: back ? cvScroll : 0, behavior: "instant" }); };
+  if (document.startViewTransition && !reduced()) document.startViewTransition(done);
+  else done();
+  last = r.view;
+}
+addEventListener("hashchange", navigate);
+addEventListener("keydown", e => { if (e.key === "Escape" && route().view === "project") location.hash = "#/"; });
+
+/* review notes toggle */
+if (REVIEW_MODE) {
+  document.body.classList.add("has-review");
+  let on = true;
+  try { on = localStorage.getItem("review") !== "off"; } catch (e) {}
+  document.body.classList.toggle("review", on);
+  $("#reviewFab").addEventListener("click", () => {
+    const v = document.body.classList.toggle("review");
+    try { localStorage.setItem("review", v ? "on" : "off"); } catch (e) {}
+  });
+}
+
+render();
+</script>
+</body>
+</html>
